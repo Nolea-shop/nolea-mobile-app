@@ -17,7 +17,7 @@ export function Home() {
   return (
     <div className="bg-[#FAF9F6]">
       {/* Hero Section — clean text-only on brand background */}
-      <section className="pt-12 md:pt-20 pb-12 md:pb-24 max-w-7xl mx-auto px-6 md:px-10">
+      <section className="pt-6 md:pt-10 pb-6 md:pb-10 max-w-7xl mx-auto px-6 md:px-10">
         <motion.div
           initial="hidden"
           animate="visible"
@@ -40,7 +40,7 @@ export function Home() {
             <motion.span
               variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="inline-flex items-center gap-2 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.2em] mb-4 sm:mb-5 text-[#5C5748]"
+              className="inline-flex items-center gap-2 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.2em] mb-2.5 sm:mb-3 text-[#5C5748]"
             >
               <span className="relative flex w-2 h-2">
                 <span className="absolute inset-0 bg-[#7A8F4E] rounded-full animate-ping opacity-60" />
@@ -52,7 +52,7 @@ export function Home() {
             <motion.h1
               variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="text-[2.25rem] sm:text-5xl md:text-6xl lg:text-[4.25rem] font-serif italic mb-4 sm:mb-5 leading-[1.02] text-[#1F1D1A]"
+              className="text-[2.25rem] sm:text-5xl md:text-6xl lg:text-[4.25rem] font-serif italic mb-3 sm:mb-3.5 leading-[1.02] text-[#1F1D1A]"
             >
               Your Guide to<br />
               <span className="italic" style={{ color: '#7A8F4E' }}>Conscious Living</span>
@@ -61,7 +61,7 @@ export function Home() {
             <motion.p
               variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="text-sm md:text-lg text-[#5C5748] mb-7 md:mb-10 max-w-md font-light leading-relaxed"
+              className="text-sm md:text-lg text-[#5C5748] mb-5 md:mb-6 max-w-md font-light leading-relaxed"
             >
               Handpicked digital guides for a slower, more intentional life — crafted with care for detail and quality.
             </motion.p>
