@@ -16,41 +16,27 @@ export function Home() {
 
   return (
     <div className="bg-[#FAF9F6]">
-      {/* Hero Section */}
-      <section className="pt-4 md:pt-8 pb-8 md:pb-16 max-w-7xl mx-auto px-4 md:px-6">
+      {/* Hero Section — clean text-only on brand background */}
+      <section className="pt-12 md:pt-20 pb-12 md:pb-24 max-w-7xl mx-auto px-6 md:px-10">
         <motion.div
           initial="hidden"
           animate="visible"
           variants={{
             visible: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
           }}
-          className="relative h-[420px] sm:h-[480px] md:h-[560px] rounded-[1.75rem] sm:rounded-[2.25rem] md:rounded-[2.5rem] overflow-hidden isolate"
+          className="relative max-w-2xl"
         >
-          {/* Single Image */}
-          <img
-            src="https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1600&q=85"
-            alt="Conscious living concept"
-            className="absolute inset-0 h-full w-full object-cover"
-            loading="eager"
-          />
-
-          {/* Single clean gradient overlay (links → rechts) */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                'linear-gradient(90deg, rgba(250,249,246,0.96) 0%, rgba(250,249,246,0.78) 35%, rgba(250,249,246,0.15) 70%, transparent 100%)',
-            }}
-          />
-
-          {/* Premium inset shadow ring (subtle depth) */}
-          <div
-            className="absolute inset-0 rounded-[inherit] pointer-events-none"
-            style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.5), inset 0 0 80px rgba(31,29,26,0.05)' }}
+          {/* Subtle decorative matcha dot (top-right) */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="hidden md:block absolute -top-8 right-0 w-24 h-24 rounded-full bg-[#7A8F4E]/8 blur-2xl pointer-events-none"
+            aria-hidden
           />
 
           {/* Content */}
-          <div className="relative h-full flex flex-col justify-end sm:justify-center pb-8 sm:pb-0 px-7 sm:px-12 md:px-16 max-w-xl">
+          <div className="relative flex flex-col">
             <motion.span
               variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -66,7 +52,7 @@ export function Home() {
             <motion.h1
               variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
               transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="text-[1.875rem] sm:text-4xl md:text-5xl lg:text-[3.5rem] font-serif italic mb-3 sm:mb-4 leading-[1.05] text-[#1F1D1A]"
+              className="text-[2.25rem] sm:text-5xl md:text-6xl lg:text-[4.25rem] font-serif italic mb-4 sm:mb-5 leading-[1.02] text-[#1F1D1A]"
             >
               Your Guide to<br />
               <span className="italic" style={{ color: '#7A8F4E' }}>Conscious Living</span>
@@ -75,7 +61,7 @@ export function Home() {
             <motion.p
               variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="hidden sm:block text-sm md:text-base text-[#5C5748] mb-6 md:mb-8 max-w-sm font-light leading-relaxed"
+              className="text-sm md:text-lg text-[#5C5748] mb-7 md:mb-10 max-w-md font-light leading-relaxed"
             >
               Handpicked digital guides for a slower, more intentional life — crafted with care for detail and quality.
             </motion.p>
