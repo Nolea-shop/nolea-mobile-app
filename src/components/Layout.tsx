@@ -277,23 +277,27 @@ export function Navigation() {
         )}
       </AnimatePresence>
 
-      {/* Mobile Bottom Navigation Bar — iOS 26 Liquid Glass Edition */}
+      {/* Mobile Bottom Navigation Bar — iOS 26 Floating Liquid Glass */}
       <motion.nav
         role="navigation"
         aria-label="Hauptnavigation"
-        initial={{ y: 100 }}
-        animate={{ y: 0 }}
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', damping: 20, stiffness: 200 }}
-        className="fixed bottom-0 left-0 right-0 z-40 md:hidden pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-1.5 px-2 transition-colors duration-700"
+        className="fixed left-3 right-3 z-40 md:hidden rounded-[28px] transition-colors duration-700"
         style={{
+          bottom: 'max(env(safe-area-inset-bottom), 0.75rem)',
           backgroundColor: 'rgba(255,255,255,0.72)',
           backdropFilter: 'blur(28px) saturate(180%)',
           WebkitBackdropFilter: 'blur(28px) saturate(180%)',
-          borderTop: '1px solid rgba(229, 222, 217, 0.45)',
-          boxShadow: '0 -8px 32px -8px rgba(31, 29, 26, 0.06)',
+          border: '1px solid rgba(229, 222, 217, 0.55)',
+          boxShadow:
+            '0 1px 0 rgba(255,255,255,0.7) inset, ' +
+            '0 8px 24px -8px rgba(31, 29, 26, 0.12), ' +
+            '0 24px 48px -16px rgba(31, 29, 26, 0.18)',
         }}
       >
-        <div className="flex justify-around items-stretch max-w-md mx-auto">
+        <div className="flex justify-around items-stretch max-w-md mx-auto px-1.5 py-1">
           <BottomTab to="/" label="Home" icon={Home} activeColors={activeColors} />
           <BottomTab to="/shop" label="Shop" icon={Store} activeColors={activeColors} />
           <BottomTab to="/guides" label="Guides" icon={BookOpen} activeColors={activeColors} badge={purchasedGuidesCount} />
@@ -347,14 +351,14 @@ function BottomTab({
       // Spring Physics Press (Suggestion #2)
       whileTap={reduceMotion ? undefined : { scale: 0.9 }}
       transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-      className="relative flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 rounded-2xl touch-manipulation outline-none focus-visible:ring-2 focus-visible:ring-[#7A8F4E]/40"
+      className="relative flex-1 flex flex-col items-center justify-center gap-0.5 py-2 px-1 rounded-[20px] touch-manipulation outline-none focus-visible:ring-2 focus-visible:ring-[#7A8F4E]/40"
     >
       {/* Animated Pill Indicator (Suggestion #4) */}
       {isActive && (
         <motion.span
           layoutId="bottomTabPill"
           aria-hidden
-          className="absolute inset-x-1.5 inset-y-0.5 rounded-2xl -z-0"
+          className="absolute inset-x-1 inset-y-0.5 rounded-[18px] -z-0"
           style={{ backgroundColor: activeColors.bgLight }}
           transition={{ type: 'spring', stiffness: 380, damping: 30 }}
         />
