@@ -180,29 +180,6 @@ export function Shop() {
       style={{ backgroundColor: colors.bgUltraLight }}
     >
       <div className="max-w-7xl mx-auto px-4 md:px-6">
-        {/* Header */}
-        <header className="mb-8 md:mb-12">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-3xl md:text-4xl lg:text-5xl font-serif italic mb-4 transition-colors duration-700"
-            style={{ color: colors.text }}
-          >
-            {category === 'All' ? 'All Products' : `${category} Guides`}
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-sm md:text-base transition-colors duration-700"
-            style={{ color: colors.text, opacity: 0.7 }}
-          >
-            {category === 'All'
-              ? 'Discover our handpicked guides for your daily life.'
-              : `Expert-curated ${category.toLowerCase()} guides to level up your life.`}
-          </motion.p>
-        </header>
-
         {/* Filter & Controls Bar */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
