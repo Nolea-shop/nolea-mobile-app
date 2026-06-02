@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { RecipeCard } from '../components/RecipeCard';
 import { getAllRecipes } from '../services/recipeService';
 import { Recipe } from '../types';
-import { ArrowUpDown, Grid, LayoutList, Search as SearchIcon, SlidersHorizontal, ChevronDown, X } from 'lucide-react';
+import { ArrowUpDown, Grid, LayoutList, Search as SearchIcon, ChevronDown, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCategory } from '../context/CategoryContext';
 import { haptics } from '../lib/native';
@@ -221,10 +221,6 @@ export function Shop() {
           <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start lg:items-center justify-between w-full">
             {/* Category Pills — Top 4 + Mehr Button */}
             <div className="flex flex-wrap gap-2 items-center w-full lg:w-auto">
-              <div className="flex items-center gap-2 mr-1 transition-colors duration-700" style={{ color: colors.text, opacity: 0.5 }}>
-                <SlidersHorizontal size={14} />
-              </div>
-
               {MAIN_CATEGORIES.map((cat) => {
                 const catColors = CATEGORY_COLORS[cat];
                 const isActive = category === cat;
@@ -294,13 +290,7 @@ export function Shop() {
             </div>
 
             {/* Right Side Controls */}
-            <div className="flex items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
-              {/* Product Count */}
-              <span className="text-xs transition-colors duration-700" style={{ color: colors.text, opacity: 0.6 }}>
-                {sortedRecipes.length}{' '}
-                {sortedRecipes.length === 1 ? 'Product' : 'Products'}
-              </span>
-
+            <div className="flex items-center gap-3 w-full lg:w-auto justify-end">
               {/* Sort Dropdown */}
               <div className="flex items-center gap-2">
                 <ArrowUpDown size={14} className="transition-colors duration-700" style={{ color: colors.text, opacity: 0.5 }} />
