@@ -17,69 +17,79 @@ export function Home() {
   return (
     <div className="bg-[#FAF9F6]">
       {/* Hero Section */}
-      <section className="py-4 md:py-8 max-w-7xl mx-auto px-4 md:px-6">
+      <section className="pt-4 md:pt-8 pb-8 md:pb-16 max-w-7xl mx-auto px-4 md:px-6">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="relative h-[340px] sm:h-[420px] md:h-[500px] rounded-2xl sm:rounded-[2rem] md:rounded-[2.5rem] overflow-hidden"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            visible: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
+          }}
+          className="relative h-[420px] sm:h-[480px] md:h-[560px] rounded-[1.75rem] sm:rounded-[2.25rem] md:rounded-[2.5rem] overflow-hidden isolate"
         >
+          {/* Single Image */}
           <img
             src="https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1600&q=85"
-            alt=""
+            alt="Conscious living concept"
             className="absolute inset-0 h-full w-full object-cover"
+            loading="eager"
           />
-          <div className="absolute inset-0 bg-[#F8F5ED]/80 sm:bg-[#F8F5ED]/65" />
-          <div className="absolute inset-y-0 left-0 w-full sm:w-3/4 bg-gradient-to-r from-[#FAF9F6]/95 via-[#FAF9F6]/85 to-transparent" />
 
-          <div className="relative h-full flex flex-col justify-end sm:justify-center pb-8 sm:pb-0 px-6 sm:px-12 md:px-16 text-[#1F1D1A] max-w-2xl md:max-w-3xl">
+          {/* Single clean gradient overlay (links → rechts) */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(90deg, rgba(250,249,246,0.96) 0%, rgba(250,249,246,0.78) 35%, rgba(250,249,246,0.15) 70%, transparent 100%)',
+            }}
+          />
+
+          {/* Premium inset shadow ring (subtle depth) */}
+          <div
+            className="absolute inset-0 rounded-[inherit] pointer-events-none"
+            style={{ boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.5), inset 0 0 80px rgba(31,29,26,0.05)' }}
+          />
+
+          {/* Content */}
+          <div className="relative h-full flex flex-col justify-end sm:justify-center pb-8 sm:pb-0 px-7 sm:px-12 md:px-16 max-w-xl">
             <motion.span
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
-              className="inline-flex items-center gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] mb-3 sm:mb-4 text-[#5C5748]"
+              variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="inline-flex items-center gap-2 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.2em] mb-4 sm:mb-5 text-[#5C5748]"
             >
-              <span className="w-1.5 h-1.5 bg-[#7A8F4E] rounded-full animate-pulse" />
-              New & Exclusive
+              <span className="relative flex w-2 h-2">
+                <span className="absolute inset-0 bg-[#7A8F4E] rounded-full animate-ping opacity-60" />
+                <span className="relative w-2 h-2 bg-[#7A8F4E] rounded-full" />
+              </span>
+              New &amp; Exclusive
             </motion.span>
 
             <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-            className="max-w-full text-[2rem] sm:text-4xl md:text-5xl lg:text-6xl font-serif italic mb-4 sm:mb-6 md:mb-8 leading-tight text-balance break-words"
+              variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="text-[1.875rem] sm:text-4xl md:text-5xl lg:text-[3.5rem] font-serif italic mb-3 sm:mb-4 leading-[1.05] text-[#1F1D1A]"
             >
-              Your Guide to{' '}
-              <span className="gradient-text">Conscious Living</span>
+              Your Guide to<br />
+              <span className="italic" style={{ color: '#7A8F4E' }}>Conscious Living</span>
             </motion.h1>
 
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="hidden sm:block text-sm md:text-base text-[#5C5748] mb-6 md:mb-8 max-w-md font-light leading-relaxed"
+              variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="hidden sm:block text-sm md:text-base text-[#5C5748] mb-6 md:mb-8 max-w-sm font-light leading-relaxed"
             >
-              Discover handpicked digital guides for food, wellness, and lifestyle — curated with love for detail and quality.
+              Handpicked digital guides for a slower, more intentional life — crafted with care for detail and quality.
             </motion.p>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="flex flex-wrap gap-3"
+              variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
             >
               <Link
                 to="/shop"
-                className="btn-press inline-flex items-center gap-2 bg-[#1F1D1A] text-white px-6 sm:px-8 py-3.5 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider hover:bg-[#7A8F4E] transition-all duration-300 shadow-lg shadow-black/10"
+                className="group inline-flex items-center gap-2 bg-[#1F1D1A] text-white px-7 py-3.5 rounded-full text-xs sm:text-sm font-semibold uppercase tracking-[0.12em] shadow-[0_4px_18px_rgba(31,29,26,0.18)] hover:shadow-[0_8px_28px_rgba(122,143,78,0.35)] hover:bg-[#7A8F4E] transition-all duration-300 btn-press touch-manipulation"
               >
                 Explore Collection
-                <ArrowRight size={16} />
-              </Link>
-              <Link
-                to="/shop?cat=lifestyle"
-                className="btn-press inline-flex items-center gap-2 bg-white/60 backdrop-blur-sm text-[#1F1D1A] px-6 sm:px-8 py-3.5 rounded-full text-xs sm:text-sm font-medium border border-[#E5E2D9] hover:bg-white transition-all"
-              >
-                Lifestyle
+                <ArrowRight size={16} strokeWidth={2} className="group-hover:translate-x-0.5 transition-transform" />
               </Link>
             </motion.div>
           </div>
