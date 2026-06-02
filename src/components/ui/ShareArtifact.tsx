@@ -1,36 +1,35 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Share2, Check } from 'lucide-react';
+import { shareContent, haptics } from '../../lib/native';
 
 interface ShareArtifactProps {
   guideTitle: string;
   guideImage?: string;
+  shareUrl?: string;
 }
 
-export function ShareArtifact({ guideTitle, guideImage }: ShareArtifactProps) {
+export function ShareArtifact({ guideTitle, shareUrl }: ShareArtifactProps) {
   const [copied, setCopied] = useState(false);
 
   const shareText = `I finished "${guideTitle}" by Nolea. 🎉`;
+  const targetUrl = shareUrl || 'https://www.nolea.shop';
 
   const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'I finished a Nolea Guide',
-          text: shareText,
-          url: 'https://www.nolea.shop',
-        });
-      } catch (e) {
-        // User cancelled
-      }
-    } else {
-      // Fallback: copy to clipboard
-      try {
-        await navigator.clipboard.writeText(shareText);
+    haptics.impact('light');
+    const ok = await shareContent({
+      title: 'I finished a Nolea Guide',
+      text: shareText,
+      url: targetUrl,
+      dialogTitle: 'Share your achievement',
+    });
+    if (ok) {
+      // Wenn Share geöffnet wurde ODER Clipboard-Fallback genutzt wurde
+      // unterscheiden wir am Plattform-Verhalten. Auf Web ohne navigator.share
+      // → copied = true.
+      if (typeof navigator !== 'undefined' && !('share' in navigator) && !(window as any).Capacitor?.isNativePlatform?.()) {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
-      } catch (e) {
-        // noop
       }
     }
   };

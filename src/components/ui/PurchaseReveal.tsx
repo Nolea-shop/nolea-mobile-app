@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle, Sparkles, Download } from 'lucide-react';
+import { haptics } from '../../lib/native';
 
 type RevealStage = 'anticipation' | 'reveal' | 'celebration' | 'done';
 
@@ -11,27 +12,24 @@ interface PurchaseRevealProps {
   onDownload?: () => void;
 }
 
-export const PurchaseReveal: React.FC<PurchaseRevealProps> = ({ 
-  title, 
-  coverUrl, 
-  downloadUrl, 
-  onDownload 
+export const PurchaseReveal: React.FC<PurchaseRevealProps> = ({
+  title,
+  coverUrl,
+  downloadUrl,
+  onDownload
 }) => {
   const [stage, setStage] = useState<RevealStage>('anticipation');
 
   useEffect(() => {
     const timer1 = setTimeout(() => {
       setStage('reveal');
-      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate(50);
-      }
+      // Echte native Haptics auf iOS/Android, navigator.vibrate im Web
+      haptics.impact('light');
     }, 1800);
 
     const timer2 = setTimeout(() => {
       setStage('celebration');
-      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate([30, 50, 30]);
-      }
+      haptics.success(); // Erfolgs-Pattern (Notification.Success auf iOS, Pattern im Web)
     }, 3000);
 
     const timer3 = setTimeout(() => {
@@ -46,6 +44,7 @@ export const PurchaseReveal: React.FC<PurchaseRevealProps> = ({
   }, []);
 
   const handleDownload = () => {
+    haptics.impact('medium');
     if (onDownload) onDownload();
     if (downloadUrl) window.open(downloadUrl, '_blank');
   };
@@ -99,12 +98,12 @@ export const PurchaseReveal: React.FC<PurchaseRevealProps> = ({
             className="relative"
           >
             <motion.div
-              animate={{ 
+              animate={{
                 boxShadow: [
-                  '0 0 20px rgba(122,143,78,0.3)', 
-                  '0 0 40px rgba(122,143,78,0.6)', 
+                  '0 0 20px rgba(122,143,78,0.3)',
+                  '0 0 40px rgba(122,143,78,0.6)',
                   '0 0 20px rgba(122,143,78,0.3)'
-                ] 
+                ]
               }}
               transition={{ repeat: Infinity, duration: 2 }}
               className="rounded-2xl p-1"
@@ -161,4 +160,4 @@ export const PurchaseReveal: React.FC<PurchaseRevealProps> = ({
       </AnimatePresence>
     </div>
   );
-}
+};

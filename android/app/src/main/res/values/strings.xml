@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Nolea</string>
+    <string name="title_activity_main">Nolea</string>
+    <string name="package_name">com.nolea.shop</string>
+    <string name="custom_url_scheme">com.nolea.shop</string>
+</resources>
