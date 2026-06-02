@@ -1,27 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import admin from 'firebase-admin';
-
-// ── Firebase Admin: lazy init so startup failures land inside try/catch
-let db: admin.firestore.Firestore | null = null;
-let firebaseReady = false;
-
-function initFirebase() {
-  if (firebaseReady) return;
-  try {
-    const fbKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY_B64
-      || process.env.FIREBASE_SERVICE_ACCOUNT_KEY
-      || '';
-    const json = JSON.parse(Buffer.from(fbKey, 'base64').toString('utf8'));
-    admin.initializeApp({
-      credential: admin.credential.cert(json),
-      projectId: 'gen-lang-client-0195318958',
-    });
-    db = admin.firestore();
-    firebaseReady = true;
-  } catch (err: any) {
-    console.error('[stripe-webhook] Firebase init failed:', err.message);
-  }
-}
+import { getFirestore } from './_firebaseAdmin';
+import { FieldValue } from 'firebase-admin';
 
 // Disable body parsing for webhook — we need raw body
 export const config = {
@@ -31,8 +10,10 @@ export const config = {
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Init Firebase inside handler so cold-start failures are caught by try/catch
-  initFirebase();
+  const db = getFirestore();
+  if (!db) {
+    console.error('[webhook] Firestore not configured');
+  }
 
   // CORS headers — secure to main domain
   const allowedOrigins = ['https://www.nolea.shop', 'https://nolea.shop'];
@@ -102,7 +83,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           payoutCents: session.amount_total - Math.round(session.amount_total * 0.10),
           authorIds: session.metadata?.authorIds ? session.metadata.authorIds.split(',') : [],
           status: 'completed',
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          createdAt: FieldValue.serverTimestamp(),
         });
       } else {
         console.warn('Firebase not ready — order not written to Firestore');

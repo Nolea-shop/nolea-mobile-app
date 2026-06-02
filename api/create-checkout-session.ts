@@ -1,60 +1,22 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import admin from 'firebase-admin';
 import { rateLimit } from './_rateLimit';
-
-// Initialize Firebase Admin if not already initialized
-function initFirebase() {
-  if (admin.apps.length) return;
-  const b64Key = process.env.FIREBASE_SERVICE_ACCOUNT_KEY_B64 || process.env.FIREBASE_SERVICE_ACCOUNT_KEY || '';
-  if (!b64Key) {
-    throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY_B64 not configured');
-  }
-  try {
-    const json = Buffer.from(b64Key, 'base64').toString('utf8');
-    admin.initializeApp({
-      credential: admin.credential.cert(JSON.parse(json)),
-      projectId: 'gen-lang-client-0195318958'
-    });
-  } catch (e) {
-    // Fallback: try direct JSON parse
-    try {
-      admin.initializeApp({
-        credential: admin.credential.cert(JSON.parse(b64Key)),
-        projectId: 'gen-lang-client-0195318958'
-      });
-    } catch {
-      throw new Error('Failed to initialize Firebase: invalid FIREBASE_SERVICE_ACCOUNT_KEY_B64');
-    }
-  }
-}
-
-// Lazy init
-let db: FirebaseFirestore.Firestore | null = null;
-function getDb() {
-  if (!db) {
-    initFirebase();
-    db = admin.firestore();
-  }
-  return db;
-}
+import { applyCors, endPreflight, requireMethod } from './_security';
+import { getFirestore } from './_firebaseAdmin';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+  applyCors(req, res, ['POST']);
+  if (endPreflight(req, res)) return;
+  if (!requireMethod(req, res, 'POST')) return;
 
   // Rate limiting: 5 requests per 5 minutes (medium)
   if (!rateLimit(req, res, 'checkout', 5, 300)) {
     return;
+  }
+
+  const db = getFirestore();
+  if (!db) {
+    console.error('Checkout: Firestore not configured');
+    return res.status(500).json({ error: 'Checkout service unavailable' });
   }
 
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -82,7 +44,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: 'Invalid cart item' });
       }
 
-      const recipeDoc = await getDb().collection('recipes').doc(item.id).get();
+      const recipeDoc = await db.collection('recipes').doc(item.id).get();
       if (!recipeDoc.exists) {
         return res.status(400).json({ error: `Product ${item.id} not found` });
       }

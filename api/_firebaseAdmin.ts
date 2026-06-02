@@ -18,7 +18,7 @@ function parseServiceAccount(rawKey: string) {
   }
 }
 
-export function initFirebaseAdmin() {
+export function initFirebaseAdmin(): admin.app.App | null {
   if (admin.apps.length) return admin.app();
 
   const rawKey = process.env.FIREBASE_SERVICE_ACCOUNT_KEY_B64 || process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
@@ -29,6 +29,20 @@ export function initFirebaseAdmin() {
     credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
     projectId: PROJECT_ID,
   });
+}
+
+/**
+ * Lazy-init helper used by webhooks and other server endpoints that
+ * need Firestore but not necessarily a verified user. Returns null
+ * if the service account is not configured (so callers can fail safely).
+ */
+let _db: admin.firestore.Firestore | null = null;
+export function getFirestore(): admin.firestore.Firestore | null {
+  if (_db) return _db;
+  const app = initFirebaseAdmin();
+  if (!app) return null;
+  _db = admin.firestore(app);
+  return _db;
 }
 
 export async function requireFirebaseAdminUser(req: VercelRequest, res: VercelResponse) {
