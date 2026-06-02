@@ -1,17 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ShoppingBasket, Menu, X, Home, Store, BookOpen, Heart, UserCircle } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useFavorites } from '../context/FavoritesContext';
 import { useCategory, DEFAULT_COLORS } from '../context/CategoryContext';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import { haptics } from '../lib/native';
+
+// motion-wrapped Link for whileTap press physics
+const MotionLink = motion.create(Link);
 
 export function Navigation() {
   const { totalItems } = useCart();
+  const { favoriteIds, purchasedGuides } = useFavorites();
   const { colors } = useCategory();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [cartAnimate, setCartAnimate] = useState(false);
+
+  // Badge counts for BottomTab
+  const favoritesCount = favoriteIds.length;
+  const purchasedGuidesCount = purchasedGuides.length;
 
   // Trigger animation when items change
   useEffect(() => {
@@ -267,52 +277,151 @@ export function Navigation() {
         )}
       </AnimatePresence>
 
-      {/* Mobile Bottom Navigation Bar */}
-      <motion.div
+      {/* Mobile Bottom Navigation Bar — iOS 26 Liquid Glass Edition */}
+      <motion.nav
+        role="navigation"
+        aria-label="Hauptnavigation"
         initial={{ y: 100 }}
         animate={{ y: 0 }}
         transition={{ type: 'spring', damping: 20, stiffness: 200 }}
-        className="fixed bottom-0 left-0 right-0 liquid-glass-strong border-t md:hidden z-40 pb-safe transition-colors duration-700"
-        style={{ borderColor: activeColors.border }}
+        className="fixed bottom-0 left-0 right-0 z-40 md:hidden pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-1.5 px-2 transition-colors duration-700"
+        style={{
+          backgroundColor: 'rgba(255,255,255,0.72)',
+          backdropFilter: 'blur(28px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(28px) saturate(180%)',
+          borderTop: '1px solid rgba(229, 222, 217, 0.45)',
+          boxShadow: '0 -8px 32px -8px rgba(31, 29, 26, 0.06)',
+        }}
       >
-        <div className="flex justify-around items-center py-2 px-2">
-          {[
-            { to: '/', label: 'Home', icon: Home },
-            { to: '/shop', label: 'Shop', icon: Store },
-            { to: '/guides', label: 'Guides', icon: BookOpen },
-            { to: '/favorites', label: 'Saved', icon: Heart },
-            { to: '/account', label: 'Konto', icon: UserCircle },
-          ].map((item) => {
-            const isActive = location.pathname === item.to;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className="flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all duration-500 min-w-[64px] touch-target"
-                style={
-                  isActive
-                    ? { color: activeColors.accent }
-                    : { color: activeColors.text, opacity: 0.5 }
-                }
-              >
-                <div className="relative">
-                  <item.icon size={24} strokeWidth={1.5} />
-                  {item.to === '/cart' && totalItems > 0 && (
-                    <span
-                      className="absolute -top-2 -right-2.5 text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full transition-colors duration-700"
-                      style={{ backgroundColor: activeColors.accent }}
-                    >
-                      {totalItems > 9 ? '9+' : totalItems}
-                    </span>
-                  )}
-                </div>
-                <span className="text-[11px] font-medium">{item.label}</span>
-              </Link>
-            );
-          })}
+        <div className="flex justify-around items-stretch max-w-md mx-auto">
+          <BottomTab to="/" label="Home" icon={Home} activeColors={activeColors} />
+          <BottomTab to="/shop" label="Shop" icon={Store} activeColors={activeColors} />
+          <BottomTab to="/guides" label="Guides" icon={BookOpen} activeColors={activeColors} badge={purchasedGuidesCount} />
+          <BottomTab to="/favorites" label="Saved" icon={Heart} activeColors={activeColors} badge={favoritesCount} />
+          <BottomTab to="/account" label="Konto" icon={UserCircle} activeColors={activeColors} />
         </div>
-      </motion.div>
+      </motion.nav>
     </>
+  );
+}
+
+// ── BottomTab: Liquid Glass Tab mit 7 Premium-Verbesserungen ──────────────
+//
+// 1. Frosted Glass Background (auf parent, hier pro Pill lokal)
+// 2. Spring Physics Press (whileTap)
+// 3. Tactile Haptics (bei Tab-Wechsel)
+// 4. Animated Pill Indicator (layoutId sliding pill)
+// 5. Icon State Cross-Fade (Outline ↔ Filled mit AnimatePresence)
+// 6. Contextual Labels (Label nur bei aktivem Tab, animiert)
+// 7. Bouncing Badge (key-basiertes Scale-Pop bei Count-Änderung)
+//
+function BottomTab({
+  to,
+  label,
+  icon: Icon,
+  activeColors,
+  badge,
+}: {
+  to: string;
+  label: string;
+  icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string; fill?: string }>;
+  activeColors: typeof DEFAULT_COLORS;
+  badge?: number;
+}) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const reduceMotion = useReducedMotion();
+  const isActive = location.pathname === to;
+
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // Tactile Haptics (Suggestion #3)
+    haptics.impact('light');
+  };
+
+  return (
+    <MotionLink
+      to={to}
+      onClick={handleClick}
+      aria-label={label}
+      aria-current={isActive ? 'page' : undefined}
+      // Spring Physics Press (Suggestion #2)
+      whileTap={reduceMotion ? undefined : { scale: 0.9 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+      className="relative flex-1 flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 rounded-2xl touch-manipulation outline-none focus-visible:ring-2 focus-visible:ring-[#7A8F4E]/40"
+    >
+      {/* Animated Pill Indicator (Suggestion #4) */}
+      {isActive && (
+        <motion.span
+          layoutId="bottomTabPill"
+          aria-hidden
+          className="absolute inset-x-1.5 inset-y-0.5 rounded-2xl -z-0"
+          style={{ backgroundColor: activeColors.bgLight }}
+          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+        />
+      )}
+
+      <span className="relative z-10 flex items-center justify-center h-7">
+        {/* Icon State Cross-Fade (Suggestion #5) */}
+        <AnimatePresence mode="wait" initial={false}>
+          {isActive ? (
+            <motion.span
+              key="filled"
+              initial={{ opacity: 0, scale: 0.7 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.7 }}
+              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+              className="inline-flex"
+            >
+              <Icon size={22} strokeWidth={1.75} fill={activeColors.accent} className="text-[color:var(--accent)]" style={{ color: activeColors.accent }} />
+            </motion.span>
+          ) : (
+            <motion.span
+              key="outline"
+              initial={{ opacity: 0, scale: 0.7 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.7 }}
+              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+              className="inline-flex"
+            >
+              <Icon size={22} strokeWidth={1.5} className="text-[#1F1D1A]/45" style={{ color: activeColors.text, opacity: 0.45 }} />
+            </motion.span>
+          )}
+        </AnimatePresence>
+
+        {/* Bouncing Cart/Favorites Badge (Suggestion #7) */}
+        {typeof badge === 'number' && badge > 0 && (
+          <AnimatePresence>
+            <motion.span
+              key={badge}
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 18 }}
+              className="absolute -top-0.5 -right-2.5 min-w-[16px] h-4 px-1 text-white text-[9px] font-bold leading-none flex items-center justify-center rounded-full shadow-sm pointer-events-none"
+              style={{ backgroundColor: activeColors.accent }}
+            >
+              {badge > 9 ? '9+' : badge}
+            </motion.span>
+          </AnimatePresence>
+        )}
+      </span>
+
+      {/* Contextual Label (Suggestion #6) — Label nur beim aktiven Tab sichtbar */}
+      <motion.span
+        aria-hidden={!isActive}
+        className="relative z-10 text-[10px] font-semibold tracking-tight overflow-hidden"
+        animate={
+          reduceMotion
+            ? { opacity: isActive ? 1 : 0, maxWidth: isActive ? 60 : 0 }
+            : { opacity: isActive ? 1 : 0, maxWidth: isActive ? 60 : 0, height: isActive ? 'auto' : 0 }
+        }
+        initial={false}
+        transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+        style={{ color: activeColors.accent, whiteSpace: 'nowrap' }}
+      >
+        {label}
+      </motion.span>
+    </MotionLink>
   );
 }
 

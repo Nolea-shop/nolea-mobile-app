@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { getFirestore } from './_firebaseAdmin';
-import { FieldValue } from 'firebase-admin';
+import { FieldValue } from 'firebase-admin/firestore';
 
 // Disable body parsing for webhook — we need raw body
 export const config = {
