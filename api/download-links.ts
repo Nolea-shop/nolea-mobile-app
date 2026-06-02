@@ -1,5 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { applyCors, extractPdfFilename, isValidStripeSessionId } from './_security';
+import { checkRateLimit } from './_rateLimit';
 
 /**
  * Returns download links for a given Stripe session ID.
@@ -10,6 +11,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   applyCors(req, res, ['GET']);
 
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+
+  const ip = req.headers['x-forwarded-for']?.toString().split(',')[0]?.trim() || req.socket.remoteAddress || 'unknown';
+  const rateLimitKey = `rl:${ip}:download-links`;
+  if (!checkRateLimit(req, rateLimitKey, 5, 60000)) {
+    return res.status(429).json({ error: 'Too many requests' });
+  }
 
   const sessionId = req.query.session_id as string;
   if (!sessionId) return res.status(400).json({ error: 'session_id is required' });

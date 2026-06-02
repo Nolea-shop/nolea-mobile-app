@@ -1,4 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
+import { rateLimit } from './_rateLimit';
 
 /**
  * Nolea AI Chat Agent
@@ -245,6 +246,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Rate limiting: 10 requests per minute (strict)
+  if (!rateLimit(req, res, 'ai-agent', 10, 60)) {
+    return;
   }
 
   const { message, history = [], customerEmail } = req.body;

@@ -18,6 +18,7 @@ import { Account } from './pages/Account';
 import { Impressum } from './pages/Impressum';
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsOfService } from './pages/TermsOfService';
+import { GuideRecommender } from './pages/GuideRecommender';
 import { ChatAgent } from './components/ChatAgent';
 import { testConnection } from './lib/firebase';
 import { useUserSync } from './hooks/useUserSync';
@@ -46,6 +47,7 @@ function App() {
                   <Route path="/account" element={<Account />} />
                   <Route path="/admin" element={<Admin />} />
                   <Route path="/success" element={<Success />} />
+                  <Route path="/recommender" element={<GuideRecommender />} />
                   <Route path="/impressum" element={<Impressum />} />
                   <Route path="/privacy" element={<PrivacyPolicy />} />
                   <Route path="/terms" element={<TermsOfService />} />

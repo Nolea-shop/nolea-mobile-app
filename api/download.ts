@@ -1,5 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { applyCors, extractPdfFilename, isSafePdfFilename, isValidStripeSessionId } from './_security';
+import { checkRateLimit } from './_rateLimit';
 
 const DEFAULT_PDF_BUCKET = 'pdfs';
 const STORAGE_BUCKET_PATTERN = /^[a-zA-Z0-9._-]{1,100}$/;
@@ -70,6 +71,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   applyCors(req, res, ['GET']);
 
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
+
+  const ip = req.headers['x-forwarded-for']?.toString().split(',')[0]?.trim() || req.socket.remoteAddress || 'unknown';
+  const rateLimitKey = `rl:${ip}:download`;
+  if (!checkRateLimit(req, rateLimitKey, 5, 60000)) {
+    return res.status(429).json({ error: 'Too many requests' });
+  }
 
   const sessionId = req.query.session_id as string;
   const product = req.query.product as string;

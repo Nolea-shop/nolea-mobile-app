@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle, Download, ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useCart } from '../context/CartContext';
 import { useFavorites } from '../context/FavoritesContext';
 import { trackAppEvent } from '../lib/analytics';
+import { PurchaseReveal } from '../components/ui/PurchaseReveal';
 
 export function Success() {
-  const [downloadLinks, setDownloadLinks] = useState<Array<{ title: string; url: string }>>([]);
+  const [downloadLinks, setDownloadLinks] = useState<Array<{ title: string; url: string; coverUrl?: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { cart, clearCart } = useCart();
@@ -45,6 +46,7 @@ export function Success() {
             const links = data.downloadLinks.map((l: any) => ({
               title: l.title,
               url: l.url,
+              coverUrl: l.coverUrl || '/placeholder-guide.jpg',
             }));
             setDownloadLinks(links);
             setLoading(false);
@@ -87,63 +89,52 @@ export function Success() {
   return (
     <div className="bg-[#FAF9F6] min-h-screen flex items-center justify-center p-6">
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="max-w-xl w-full bg-white rounded-[2.5rem] p-12 text-center shadow-xl border border-[#E5E2D9]"
+        className="max-w-xl w-full bg-white rounded-[2.5rem] p-8 md:p-12 text-center shadow-xl border border-[#E5E2D9]"
       >
-        <div className="w-20 h-20 bg-[#F2EFE9] text-[#7A8F4E] rounded-full flex items-center justify-center mx-auto mb-8">
-          <CheckCircle size={48} strokeWidth={1.5} />
-        </div>
-
-        <h1 className="text-4xl font-serif italic text-[#1F1D1A] mb-4">Thank you for your purchase!</h1>
-        <p className="text-[#5C5748] mb-10 leading-relaxed font-serif italic text-lg">
+        <h1 className="text-3xl md:text-4xl font-serif italic text-[#1F1D1A] mb-4">Thank you for your purchase!</h1>
+        <p className="text-[#5C5748] mb-10 leading-relaxed font-serif italic text-base md:text-lg">
           Your digital products are ready. We have sent you a confirmation email.
         </p>
 
-        <div className="bg-[#F2EFE9] rounded-2xl p-6 mb-10 border border-[#E5E2D9]">
-          {loading && (
-            <div className="flex flex-col items-center gap-2 py-2">
-              <Loader2 className="animate-spin text-[#7A8F4E]" size={24} />
-              <p className="text-xs text-[#5C5748] uppercase tracking-[0.2em] font-bold">
-                Loading download links...
-              </p>
-            </div>
-          )}
+        {loading && !error && (
+          <div className="bg-[#F2EFE9] rounded-2xl p-8 mb-10 border border-[#E5E2D9]">
+            <PurchaseReveal
+              title="Your Guide"
+              coverUrl="/placeholder-guide.jpg"
+              downloadUrl="#"
+            />
+          </div>
+        )}
 
-          {error && (
-            <p className="text-xs text-red-600 uppercase tracking-[0.2em] font-bold">
+        {error && (
+          <div className="bg-[#F2EFE9] rounded-2xl p-8 mb-10 border border-[#E5E2D9]">
+            <p className="text-sm text-red-600 uppercase tracking-[0.2em] font-bold">
               {error}
             </p>
-          )}
+          </div>
+        )}
 
-          {!loading && !error && downloadLinks.length > 0 && (
-            <div className="flex flex-col gap-3">
-              {downloadLinks.map((link, idx) => (
-                <a
-                  key={idx}
-                  href={link.url}
-                  download
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full bg-[#1F1D1A] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-black transition-all text-xs uppercase tracking-widest"
-                  onClick={() => trackAppEvent('guide_downloaded', { title: link.title })}
-                >
-                  <Download size={20} strokeWidth={1.5} />
-                  Download {link.title} (PDF)
-                </a>
-              ))}
-              <p className="text-[10px] text-[#5C5748] uppercase tracking-[0.2em] font-bold text-center mt-1">
-                Link valid for 48 hours.
-              </p>
-            </div>
-          )}
-        </div>
+        {!loading && !error && downloadLinks.length > 0 && (
+          <div className="flex flex-col gap-6 mb-10">
+            {downloadLinks.map((link, idx) => (
+              <PurchaseReveal
+                key={idx}
+                title={link.title}
+                coverUrl={link.coverUrl || '/placeholder-guide.jpg'}
+                downloadUrl={link.url}
+                onDownload={() => trackAppEvent('guide_downloaded', { title: link.title })}
+              />
+            ))}
+          </div>
+        )}
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link to="/guides" className="text-[#1F1D1A] font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:gap-4 transition-all">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+          <Link to="/guides" className="text-[#1F1D1A] font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:gap-4 transition-all py-2">
             Meine Guides <ArrowRight size={18} />
           </Link>
-          <Link to="/shop" className="text-[#7A8F4E] font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:gap-4 transition-all">
+          <Link to="/shop" className="text-[#7A8F4E] font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:gap-4 transition-all py-2">
             Continue Shopping <ArrowRight size={18} />
           </Link>
         </div>

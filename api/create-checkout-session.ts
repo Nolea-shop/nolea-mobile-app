@@ -1,5 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import admin from 'firebase-admin';
+import { rateLimit } from './_rateLimit';
 
 // Initialize Firebase Admin if not already initialized
 function initFirebase() {
@@ -49,6 +50,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  // Rate limiting: 5 requests per 5 minutes (medium)
+  if (!rateLimit(req, res, 'checkout', 5, 300)) {
+    return;
   }
 
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY;

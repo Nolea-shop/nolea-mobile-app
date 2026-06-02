@@ -8,6 +8,7 @@ import { getStripe } from '../lib/stripe';
 import toast from 'react-hot-toast';
 import { motion } from 'motion/react';
 import { trackAppEvent } from '../lib/analytics';
+import { HonestCheckoutNotice } from '../components/ui/HonestCheckoutNotice';
 
 export function Cart() {
   const { cart, removeFromCart, totalPrice } = useCart();
@@ -69,41 +70,93 @@ export function Cart() {
   if (cart.length === 0) {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         className="bg-[#FAF9F6] min-h-screen flex flex-col items-center justify-center p-6 text-center"
       >
-        <div className="w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-[#F2EFE9] to-[#E5E2D9] flex items-center justify-center rounded-full mb-8 text-[#7A8F4E]">
-          <ShoppingBag size={48} strokeWidth={1.5} />
-        </div>
-        <h2 className="text-2xl md:text-3xl font-serif italic text-[#1F1D1A] mb-4">
-          Your cart is empty
-        </h2>
-        <p className="text-[#5C5748] mb-6 md:mb-8 max-w-sm text-sm md:text-base leading-relaxed">
-          Looks like you have not added any guides yet. Discover our handpicked digital products!
-        </p>
-        <Link
-          to="/shop"
-          className="btn-press bg-[#7A8F4E] text-white px-8 md:px-10 py-3 md:py-4 rounded-full text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-[#5C6F3A] transition-all shadow-md hover:shadow-lg flex items-center gap-2"
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 20 }}
+          className="max-w-md w-full"
         >
-          Go to Shop <ArrowRight size={18} />
-        </Link>
-
-        {/* Trust Badges for Empty State */}
-        <div className="flex flex-wrap justify-center gap-4 mt-12 md:mt-16 px-4">
-          {[
-            { icon: Lock, text: 'Secure Checkout' },
-            { icon: ShieldCheck, text: 'Buyer Protection' },
-          ].map((badge, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-2 text-xs text-[#5C5748] bg-white px-4 py-2 rounded-full border border-[#E5E2D9]"
-            >
-              <badge.icon size={14} className="text-[#7A8F4E]" />
-              <span>{badge.text}</span>
+          {/* Illustration */}
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+            className="relative mx-auto w-28 h-28 md:w-36 md:h-36 mb-8"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-[#7A8F4E]/10 to-[#E5E2D9]/30 rounded-full blur-xl" />
+            <div className="relative w-full h-full bg-gradient-to-br from-[#F2EFE9] to-[#E5E2D9] rounded-full flex items-center justify-center border border-[#E5E2D9] shadow-sm">
+              <ShoppingBag size={48} strokeWidth={1.5} className="text-[#7A8F4E]" />
             </div>
-          ))}
-        </div>
+            {/* Decorative elements */}
+            <motion.div
+              animate={{ y: [-3, 3, -3], rotate: [0, 5, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute -top-2 -right-2 w-6 h-6 bg-[#7A8F4E]/20 rounded-full"
+            />
+            <motion.div
+              animate={{ y: [3, -3, 3], rotate: [0, -5, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute -bottom-1 -left-3 w-4 h-4 bg-[#7A8F4E]/15 rounded-full"
+            />
+          </motion.div>
+
+          {/* Content */}
+          <motion.h2
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="text-2xl md:text-3xl font-serif italic text-[#1F1D1A] mb-4"
+          >
+            Your cart is empty
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="text-[#5C5748] mb-8 max-w-sm text-sm md:text-base leading-relaxed mx-auto"
+          >
+            Looks like you have not added any guides yet. Discover our handpicked digital products!
+          </motion.p>
+
+          {/* CTA Button */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+            <Link
+              to="/shop"
+              className="inline-flex items-center gap-2 bg-[#7A8F4E] text-white px-8 md:px-10 py-3.5 md:py-4 rounded-full text-xs md:text-sm font-bold uppercase tracking-wider hover:bg-[#5C6F3A] transition-all shadow-md hover:shadow-lg btn-press"
+            >
+              Explore Guides <ArrowRight size={18} />
+            </Link>
+          </motion.div>
+
+          {/* Trust Badges */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
+            className="flex flex-wrap justify-center gap-3 mt-12"
+          >
+            {[
+              { icon: Lock, text: 'Secure Checkout' },
+              { icon: ShieldCheck, text: 'Buyer Protection' },
+            ].map((badge, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-2 text-xs text-[#5C5748] bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full border border-[#E5E2D9]"
+              >
+                <badge.icon size={14} className="text-[#7A8F4E]" />
+                <span>{badge.text}</span>
+              </div>
+            ))}
+          </motion.div>
+        </motion.div>
       </motion.div>
     );
   }
@@ -207,6 +260,8 @@ export function Cart() {
                   </span>
                 </div>
               </div>
+
+              <HonestCheckoutNotice />
 
               <button
                 onClick={handleCheckout}

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Heart, Search } from 'lucide-react';
+import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { RecipeCard } from '../components/RecipeCard';
 import { useFavorites } from '../context/FavoritesContext';
@@ -36,19 +37,59 @@ export function Favorites() {
             ))}
           </div>
         ) : (
-          <div className="bg-white border border-[#E5E2D9] rounded-[2rem] p-8 md:p-12 text-center shadow-sm">
-            <div className="w-20 h-20 rounded-full bg-[#F2EFE9] text-[#7A8F4E] grid place-items-center mx-auto mb-6">
-              <Heart size={34} strokeWidth={1.5} />
-            </div>
-            <h2 className="text-2xl font-serif italic text-[#1F1D1A] mb-3">Noch nichts gespeichert</h2>
-            <p className="text-[#5C5748] max-w-md mx-auto mb-7">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-white border border-[#E5E2D9] rounded-[2rem] p-8 md:p-12 text-center shadow-sm max-w-md mx-auto"
+          >
+            {/* Illustration */}
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+              className="relative mx-auto w-24 h-24 mb-6"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-[#7A8F4E]/10 to-[#E5E2D9]/30 rounded-full blur-xl" />
+              <div className="relative w-full h-full bg-gradient-to-br from-[#F2EFE9] to-[#E5E2D9] rounded-full flex items-center justify-center border border-[#E5E2D9] shadow-sm">
+                <Heart size={34} strokeWidth={1.5} className="text-[#7A8F4E]" />
+              </div>
+              <motion.div
+                animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
+                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                className="absolute -top-1 -right-1 w-5 h-5 bg-red-400/20 rounded-full"
+              />
+            </motion.div>
+
+            {/* Content */}
+            <motion.h2
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="text-2xl font-serif italic text-[#1F1D1A] mb-3"
+            >
+              Noch nichts gespeichert
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-[#5C5748] max-w-md mx-auto mb-7 text-sm leading-relaxed"
+            >
               Tippe auf das Herz an einem Produkt, damit du es spaeter schneller wiederfindest.
-            </p>
-            <Link to="/shop" className="inline-flex items-center gap-2 bg-[#1F1D1A] text-white px-7 py-3 rounded-full text-xs font-bold uppercase tracking-wider btn-press">
-              <Search size={15} />
-              Shop durchsuchen
-            </Link>
-          </div>
+            </motion.p>
+
+            {/* CTA */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <Link to="/shop" className="inline-flex items-center gap-2 bg-[#1F1D1A] text-white px-7 py-3 rounded-full text-xs font-bold uppercase tracking-wider btn-press hover:bg-black transition-all shadow-md">
+                <Search size={15} />
+                Shop durchsuchen
+              </Link>
+            </motion.div>
+          </motion.div>
         )}
       </div>
     </div>
