@@ -71,16 +71,22 @@ export function Navigation() {
           {/* Logo */}
           <Link
             to="/"
-            className="text-xl sm:text-2xl font-serif font-bold italic tracking-tight transition-colors duration-700"
-            style={{ color: activeColors.text }}
+            className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden transition-transform duration-300 hover:scale-105 active:scale-95 block shrink-0"
+            aria-label="Nolea — Home"
             onMouseEnter={(e) => {
-              (e.target as HTMLElement).style.color = activeColors.accent;
+              (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 18px rgba(122,143,78,0.25)';
             }}
             onMouseLeave={(e) => {
-              (e.target as HTMLElement).style.color = activeColors.text;
+              (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 8px rgba(31,29,26,0.06)';
             }}
+            style={{ boxShadow: '0 2px 8px rgba(31,29,26,0.06)' }}
           >
-            Nolea
+            <img
+              src="/nolea-logo.webp"
+              alt="Nolea"
+              className="w-full h-full object-cover"
+              loading="eager"
+            />
           </Link>
 
           {/* Desktop Navigation */}
