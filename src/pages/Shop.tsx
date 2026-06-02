@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { RecipeCard } from '../components/RecipeCard';
 import { getAllRecipes } from '../services/recipeService';
 import { Recipe } from '../types';
-import { ArrowUpDown, Grid, LayoutList, Search as SearchIcon, SlidersHorizontal } from 'lucide-react';
-import { motion } from 'motion/react';
+import { ArrowUpDown, Grid, LayoutList, Search as SearchIcon, SlidersHorizontal, ChevronDown, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { useCategory } from '../context/CategoryContext';
+import { haptics } from '../lib/native';
 
 // Category color system — each category has its own identity
 const CATEGORY_COLORS: Record<string, {
@@ -110,6 +111,11 @@ const CATEGORY_COLORS: Record<string, {
 
 const CATEGORIES = Object.keys(CATEGORY_COLORS);
 
+// Hauptkategorien: sichtbar in der Pill-Leiste (Top 4 Nischen)
+// Weitere Kategorien: gruppiert im "Mehr"-Bottom-Sheet
+const MAIN_CATEGORIES = ['All', 'Tech', 'Fitness', 'Nutrition', 'Finance'];
+const MORE_CATEGORIES = CATEGORIES.filter((c) => !MAIN_CATEGORIES.includes(c));
+
 export function Shop() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
@@ -117,7 +123,24 @@ export function Shop() {
   const [category, setCategory] = useState('All');
   const [sortBy, setSortBy] = useState('default');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
   const { setActiveCategory } = useCategory();
+
+  // Beim Kategorie-Wechsel: leichtes haptisches Feedback
+  const handleCategoryChange = (cat: string) => {
+    haptics.impact('light');
+    setCategory(cat);
+  };
+
+  // Beim Öffnen des "Mehr"-Sheets: mittleres haptisches Feedback
+  const openMore = () => {
+    haptics.impact('medium');
+    setIsMoreOpen(true);
+  };
+  const closeMore = () => {
+    haptics.impact('light');
+    setIsMoreOpen(false);
+  };
 
   const colors = CATEGORY_COLORS[category] || CATEGORY_COLORS['All'];
 
@@ -218,51 +241,79 @@ export function Shop() {
             )}
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start lg:items-center justify-between">
-            {/* Category Pills */}
+          <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 items-start lg:items-center justify-between w-full">
+            {/* Category Pills — Top 4 + Mehr Button */}
             <div className="flex flex-wrap gap-2 items-center w-full lg:w-auto">
-              <div className="flex items-center gap-2 mr-2 transition-colors duration-700" style={{ color: colors.text, opacity: 0.6 }}>
+              <div className="flex items-center gap-2 mr-1 transition-colors duration-700" style={{ color: colors.text, opacity: 0.5 }}>
                 <SlidersHorizontal size={14} />
               </div>
-              {CATEGORIES.map((cat) => {
+
+              {MAIN_CATEGORIES.map((cat) => {
                 const catColors = CATEGORY_COLORS[cat];
                 const isActive = category === cat;
                 return (
                   <button
                     key={cat}
-                    onClick={() => setCategory(cat)}
-                    className="px-4 sm:px-5 py-2.5 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-500 btn-press"
-                    style={
-                      isActive
-                        ? {
-                            backgroundColor: catColors.bg,
-                            color: '#FFFFFF',
-                            boxShadow: `0 4px 14px ${catColors.bg}40`,
-                          }
-                        : {
-                            backgroundColor: '#FFFFFF',
-                            color: colors.text,
-                            border: `1px solid ${colors.border}`,
-                            opacity: 0.8,
-                          }
-                    }
+                    onClick={() => handleCategoryChange(cat)}
+                    className="relative px-4 sm:px-5 py-2.5 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-colors duration-300 btn-press touch-manipulation overflow-hidden"
+                    style={{
+                      color: isActive ? '#FFFFFF' : colors.text,
+                      opacity: isActive ? 1 : 0.7,
+                    }}
                     onMouseEnter={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.backgroundColor = catColors.bgLight;
-                        e.currentTarget.style.borderColor = catColors.border;
-                      }
+                      if (!isActive) e.currentTarget.style.opacity = '1';
                     }}
                     onMouseLeave={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.backgroundColor = '#FFFFFF';
-                        e.currentTarget.style.borderColor = colors.border;
-                      }
+                      if (!isActive) e.currentTarget.style.opacity = '0.7';
                     }}
                   >
-                    {cat}
+                    {isActive && (
+                      <motion.span
+                        layoutId="activeCategoryPill"
+                        className="absolute inset-0 rounded-full -z-0"
+                        style={{ backgroundColor: catColors.bg }}
+                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                    <span className="relative z-10">{cat}</span>
                   </button>
                 );
               })}
+
+              {/* "Mehr" Button — öffnet Bottom-Sheet mit den restlichen Kategorien */}
+              <button
+                onClick={openMore}
+                aria-label={`Mehr Kategorien (${MORE_CATEGORIES.length})`}
+                aria-expanded={isMoreOpen}
+                className="relative flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wider transition-all duration-300 btn-press touch-manipulation"
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.7)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
+                  color: colors.text,
+                  border: '1px solid rgba(229, 222, 217, 0.6)',
+                }}
+              >
+                Mehr
+                <motion.span
+                  animate={{ rotate: isMoreOpen ? 180 : 0 }}
+                  transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                  className="inline-flex"
+                >
+                  <ChevronDown size={13} strokeWidth={2.5} />
+                </motion.span>
+                {/* Badge: zeigt Anzahl der versteckten Kategorien */}
+                {MORE_CATEGORIES.length > 0 && (
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-1 -right-1 text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full shadow-sm pointer-events-none"
+                    style={{ backgroundColor: colors.accent }}
+                  >
+                    {MORE_CATEGORIES.length}
+                  </motion.span>
+                )}
+              </button>
             </div>
 
             {/* Right Side Controls */}
@@ -323,6 +374,97 @@ export function Shop() {
             </div>
           </div>
         </motion.div>
+
+        {/* ── "Mehr Kategorien" Bottom-Sheet ───────────────────────────── */}
+        <AnimatePresence>
+          {isMoreOpen && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                onClick={closeMore}
+                className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+                aria-hidden
+              />
+              <motion.div
+                role="dialog"
+                aria-modal="true"
+                aria-label="Alle Kategorien"
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '100%' }}
+                transition={{ type: 'spring', damping: 28, stiffness: 320 }}
+                className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl shadow-2xl overflow-hidden pb-[max(env(safe-area-inset-bottom),1rem)]"
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.92)',
+                  backdropFilter: 'blur(28px) saturate(180%)',
+                  WebkitBackdropFilter: 'blur(28px) saturate(180%)',
+                  borderTop: '1px solid rgba(229, 222, 217, 0.5)',
+                }}
+              >
+                {/* Drag-Handle */}
+                <div className="flex justify-center pt-3 pb-1">
+                  <div className="w-10 h-1 rounded-full" style={{ backgroundColor: colors.border }} />
+                </div>
+
+                <div className="px-6 pt-2 pb-6">
+                  <div className="flex justify-between items-center mb-5">
+                    <div>
+                      <h3 className="text-lg font-serif italic" style={{ color: colors.text }}>
+                        Weitere Kategorien
+                      </h3>
+                      <p className="text-xs mt-0.5" style={{ color: colors.text, opacity: 0.55 }}>
+                        {MORE_CATEGORIES.length} zusätzliche Nischen
+                      </p>
+                    </div>
+                    <button
+                      onClick={closeMore}
+                      aria-label="Schließen"
+                      className="p-2 rounded-full active:scale-90 transition-transform"
+                      style={{ backgroundColor: colors.bgLight }}
+                    >
+                      <X size={18} style={{ color: colors.text }} />
+                    </button>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2.5">
+                    {MORE_CATEGORIES.map((cat) => {
+                      const catColors = CATEGORY_COLORS[cat];
+                      const isActive = category === cat;
+                      return (
+                        <motion.button
+                          key={cat}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => {
+                            handleCategoryChange(cat);
+                            closeMore();
+                          }}
+                          className="relative px-5 py-3 rounded-2xl text-sm font-medium transition-all overflow-hidden"
+                          style={{
+                            color: isActive ? '#FFFFFF' : colors.text,
+                            backgroundColor: isActive ? catColors.bg : colors.bgLight,
+                          }}
+                        >
+                          {isActive && (
+                            <motion.span
+                              layoutId="activeCategoryPill"
+                              className="absolute inset-0 rounded-2xl -z-0"
+                              style={{ backgroundColor: catColors.bg }}
+                              transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                            />
+                          )}
+                          <span className="relative z-10">{cat}</span>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
 
         {/* Products Grid */}
         {loading ? (
