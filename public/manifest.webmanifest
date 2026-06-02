@@ -1,0 +1,25 @@
+{
+  "name": "Nolea Studio",
+  "short_name": "Nolea",
+  "description": "Premium mobile shopping app for digital PDF guides.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "background_color": "#FAF9F6",
+  "theme_color": "#FAF9F6",
+  "orientation": "portrait",
+  "categories": ["shopping", "lifestyle", "education"],
+  "icons": [
+    {
+      "src": "/nolea-app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    { "name": "Shop", "short_name": "Shop", "url": "/shop" },
+    { "name": "Meine Guides", "short_name": "Guides", "url": "/guides" }
+  ]
+}

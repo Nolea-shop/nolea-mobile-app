@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Nolea icon">
+  <rect width="512" height="512" rx="112" fill="#FAF9F6"/>
+  <circle cx="372" cy="142" r="86" fill="#D9DED1"/>
+  <path d="M126 352c38-116 124-190 260-222-26 116-96 195-210 237 44 6 88 0 132-18-52 58-129 78-211 55 20-12 37-29 49-51z" fill="#7A8F4E"/>
+  <text x="93" y="303" fill="#1F1D1A" font-family="Georgia, serif" font-size="134" font-style="italic" font-weight="700">n</text>
+</svg>

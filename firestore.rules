@@ -1,0 +1,100 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'julianlegendstar@gmail.com' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Validate Recipe
+    function isValidRecipe(data) {
+      return data.keys().hasAll(['title', 'description', 'price', 'imageUrl', 'createdAt']) &&
+             data.title is string && data.title.size() <= 200 &&
+             data.description is string && data.description.size() <= 2000 &&
+             data.price is number && data.price >= 0 &&
+             data.imageUrl is string &&
+             data.createdAt is timestamp &&
+             (data.isUserGenerated != true || (data.authorId is string && data.authorEmail is string));
+    }
+
+    // Validate Order
+    function isValidOrder(data) {
+      return data.keys().hasAll(['userId', 'items', 'total', 'status', 'createdAt']) &&
+             data.userId == request.auth.uid &&
+             data.items is list &&
+             data.total is number &&
+             data.status in ['pending', 'completed', 'cancelled'] &&
+             data.createdAt == request.time;
+    }
+
+    // Validate User Profile
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['email', 'role', 'createdAt', 'updatedAt']) &&
+             data.email is string &&
+             data.role in ['user', 'admin'] &&
+             data.createdAt is timestamp &&
+             data.updatedAt is timestamp;
+    }
+
+    // Recipes: Anyone can read Online recipes, only Admin can write
+    // UPDATE: Users can create recipes (if isUserGenerated is true)
+    match /recipes/{recipeId} {
+      allow read: if resource.data.isOnline == true || isAdmin() || resource.data.authorId == request.auth.uid;
+      allow create: if isSignedIn() && (
+        isAdmin() || 
+        (incoming().isUserGenerated == true && incoming().authorId == request.auth.uid && incoming().isOnline == true)
+      ) && isValidRecipe(incoming());
+      allow update: if (isAdmin() || (resource.data.authorId == request.auth.uid)) && isValidRecipe(incoming());
+      allow delete: if isAdmin() || resource.data.authorId == request.auth.uid;
+    }
+
+    // Orders: Owner and Admin can read. NO ONE can create/update directly anymore!
+    // High-End Security: Orders are only created by the System (Admin SDK) via Webhook.
+    match /orders/{orderId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    // Users: Owner and Admin can read, Owner can create/update their own profile
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && isValidUserProfile(incoming()) && (incoming().role == 'user' || request.auth.token.email == 'julianlegendstar@gmail.com');
+      allow update: if isOwner(userId) && isValidUserProfile(incoming()) && (
+        (incoming().role == existing().role) || // User can't change their own role normally
+        isAdmin()
+      );
+    }
+  }
+}

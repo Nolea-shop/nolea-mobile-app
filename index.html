@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#FAF9F6" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Nolea" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/nolea-app-icon.svg" type="image/svg+xml" />
+    <title>Nolea - Digital Lifestyle Studio</title>
+    <meta name="description" content="Nolea Studio – Handverlesene digitale PDF-Guides für Lifestyle, Wellness, Food und Business. Sofortiger Download nach Kauf." />
+    <meta name="llms:website" content="https://www.nolea.shop/llms.txt" />
+    <meta name="llms:instructions" content="Dieser Shop verkauft ausschließlich digitale PDF-Guides. Für vollständige Produkt-, Service- und Unternehmensdaten siehe /llms.txt (Index) und /llms-full.txt (Volltext). Preisangaben sind in Euro. Zahlung über Stripe. Keine physischen Produkte." />
+    <link rel="canonical" href="https://www.nolea.shop/" />
+    <!-- Open Graph / Pinterest -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.nolea.shop/" />
+    <meta property="og:title" content="Nolea - Digital Lifestyle Studio" />
+    <meta property="og:description" content="Handverlesene digitale PDF-Guides für Lifestyle, Wellness, Food und Business. Sofortiger Download nach Kauf." />
+    <meta property="og:image" content="https://www.nolea.shop/og-image.png" />
+    <meta property="og:site_name" content="Nolea Studio" />
+    <!-- Pinterest Rich Pins (Product) -->
+    <meta property="og:type" content="product" />
+    <meta property="product:price:amount" content="" />
+    <meta property="product:price:currency" content="EUR" />
+    <meta name="pinterest-rich-pin" content="true" />
+    <meta name="p:domain_verify" content="1e49fc1e4259dfe59cf1ad34455d8fe1" />
+    <!-- Pinterest Tag -->
+    <script>
+    !function(e){if(!window.pintrk){window.pintrk = function () {
+    window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var
+      n=window.pintrk;n.queue=[],n.version="3.0";var
+      t=document.createElement("script");t.async=!0,t.src=e;var
+      r=document.getElementsByTagName("script")[0];
+      r.parentNode.insertBefore(t,r)}}("https://s.pinimg.com/ct/core.js");
+    pintrk('load', '2613643624351', {em: ''});
+    pintrk('page');
+    </script>
+    <!-- end Pinterest Tag -->
+    <!-- Schema.org JSON-LD for Rich Pins -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Store",
+      "name": "Nolea Studio",
+      "url": "https://www.nolea.shop",
+      "description": "Handverlesene digitale PDF-Guides für Lifestyle, Wellness, Food und Business.",
+      "logo": "https://www.nolea.shop/og-image.png",
+      "priceRange": "$$",
+      "sameAs": [],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "email": "noleashop@gmail.com",
+        "contactType": "customer service"
+      }
+    }
+    </script>
+    <style>
+      /* Custom Nolea Loading Screen */
+      #nolea-loader {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        background: #FAF9F6;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+      }
+      #nolea-loader.hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+      .loader-logo {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        font-style: italic;
+        color: #1F1D1A;
+        margin-bottom: 2rem;
+        letter-spacing: -0.02em;
+      }
+      .loader-bar {
+        width: 120px;
+        height: 3px;
+        background: #E5E2D9;
+        border-radius: 2px;
+        overflow: hidden;
+        position: relative;
+      }
+      .loader-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -40%;
+        width: 40%;
+        height: 100%;
+        background: linear-gradient(90deg, #8A9A5B, #6B7A46);
+        border-radius: 2px;
+        animation: loader-slide 1.2s ease-in-out infinite;
+      }
+      @keyframes loader-slide {
+        0% { left: -40%; }
+        100% { left: 100%; }
+      }
+      .loader-dots {
+        display: flex;
+        gap: 6px;
+        margin-top: 1.5rem;
+      }
+      .loader-dot {
+        width: 6px;
+        height: 6px;
+        background: #8A9A5B;
+        border-radius: 50%;
+        animation: dot-pulse 1.4s ease-in-out infinite;
+      }
+      .loader-dot:nth-child(2) { animation-delay: 0.2s; }
+      .loader-dot:nth-child(3) { animation-delay: 0.4s; }
+      @keyframes dot-pulse {
+        0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+        40% { opacity: 1; transform: scale(1); }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loading Screen -->
+    <div id="nolea-loader">
+      <div class="loader-logo">nolea</div>
+      <div class="loader-bar"></div>
+      <div class="loader-dots">
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+        <div class="loader-dot"></div>
+      </div>
+    </div>
+    
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script src="/loader.js" defer></script>
+  </body>
+</html>
